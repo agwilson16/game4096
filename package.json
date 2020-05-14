@@ -1,5 +1,5 @@
 {
-  "name": "Game 4096",
+  "name": "Game4096",
   "version": "1.1.0",
   "description": "A Phaser 3 Project",
   "main": "src/index.js",

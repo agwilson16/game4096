@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-
-const emptyTileKey = 'emptyTile';
+import { gameOptions } from '../index';
+import { emptyTileKey } from './Bootgame';
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -10,11 +10,24 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        this.add.image(120 + j * 220, 120 + i * 220, emptyTileKey);
+    //create the board -- see gameOptions in index.js
+    //this will create a 4 x 4 board
+    for (let i = 0; i < gameOptions.boardSize.rows; i++) {
+      for (let j = 0; j < gameOptions.boardSize.columns; j++) {
+        const tilePosition = this.getTilePosition(i, j);
+        this.add.image(tilePosition.x, tilePosition.y, emptyTileKey);
       }
     }
+  }
+
+  getTilePosition(row, col) {
+    const posX =
+      gameOptions.tileSpacing * (col + 1) + gameOptions.tileSize * (col + 0.5);
+
+    const posY =
+      gameOptions.tileSpacing * (row + 1) + gameOptions.tileSize * (row + 0.5);
+
+    return new Phaser.Geom.Point(posX, posY);
   }
 
   update() {}

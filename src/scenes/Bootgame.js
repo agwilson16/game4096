@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const emptyTileKey = 'emptyTile';
+export const emptyTileKey = 'emptyTile';
 
 export default class Bootgame extends Phaser.Scene {
   constructor() {

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import Game from './scenes/Game';
 import BootGame from './scenes/Bootgame';
 
-const gameOptions = {
+export const gameOptions = {
   tileSize: 200,
   tileSpacing: 20,
   boardSize: {
