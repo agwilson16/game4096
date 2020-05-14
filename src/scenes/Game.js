@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { gameOptions } from '../index';
-import { emptyTileKey } from './Bootgame';
+import { emptyTileKey, tilesKey } from './Bootgame';
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -15,7 +15,17 @@ export default class Game extends Phaser.Scene {
     for (let i = 0; i < gameOptions.boardSize.rows; i++) {
       for (let j = 0; j < gameOptions.boardSize.columns; j++) {
         const tilePosition = this.getTilePosition(i, j);
+
         this.add.image(tilePosition.x, tilePosition.y, emptyTileKey);
+
+        const tile = this.add.sprite(
+          tilePosition.x,
+          tilePosition.y,
+          tilesKey,
+          11
+        );
+
+        tile.visible = false;
       }
     }
   }
