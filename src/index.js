@@ -9,7 +9,17 @@ export const gameOptions = {
     rows: 4,
     columns: 4
   },
-  tweenSpeed: 500 //in ms
+  tweenSpeed: 500, //in ms,
+  swipeMaxTime: 1000,
+  swipeMinDistance: 20,
+  swipeMinNormal: 0.85
+};
+
+export const directions = {
+  left: 0,
+  right: 1,
+  up: 2,
+  down: 3
 };
 
 const gameConfig = {

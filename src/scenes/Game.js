@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { gameOptions } from '../index';
+import { directions, gameOptions } from '../index';
 import { emptyTileKey, tilesKey } from './Bootgame';
 
 export default class Game extends Phaser.Scene {
@@ -40,6 +40,14 @@ export default class Game extends Phaser.Scene {
     }
     this.addTile();
     this.addTile();
+
+    //handle user input
+    //swipe ends when finger raised or mouse button released (pointerup)
+    //keyboard
+    this.input.keyboard.on('keydown', this.handleKey, this);
+
+    //swipes
+    this.input.on('pointerup', this.handleSwipe, this);
   }
 
   getTilePosition(row, col) {
@@ -87,6 +95,65 @@ export default class Game extends Phaser.Scene {
         }
       });
     }
+  }
+
+  //handle keyboard and swipe events
+  handleKey(e) {
+    //callbacks like handleKey get automatic access to the event (e)
+    const keyPressed = e.code;
+
+    if (this.canMove) {
+      switch (e.code) {
+        case 'KeyA':
+        case 'ArrowLeft':
+          this.makeMove(directions.left);
+          break;
+        case 'KeyD':
+        case 'ArrowRight':
+          this.makeMove(directions.right);
+          break;
+        case 'KeyW':
+        case 'ArrowUp':
+          this.makeMove(directions.up);
+          break;
+        case 'KeyS':
+        case 'ArrowDown':
+          this.makeMove(directions.down);
+          break;
+      }
+    }
+  }
+
+  handleSwipe(e) {
+    //swipe ends when finger raised or mouse button released
+
+    if (this.canMove) {
+      const swipeTime = e.upTime - e.downTime;
+      const fastEnough = swipeTime < gameOptions.swipeMaxTime;
+      const swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
+      const swipeMagnitude = Phaser.Geom.Point.GetMagnitude(swipe);
+      const longEnough = swipeMagnitude > gameOptions.swipeMinDistance;
+
+      if (longEnough && fastEnough) {
+        Phaser.Geom.Point.SetMagnitude(swipe, 1);
+        if (swipe.x > gameOptions.swipeMinNormal) {
+          this.makeMove(directions.right);
+        }
+        if (swipe.x < -gameOptions.swipeMinNormal) {
+          this.makeMove(directions.left);
+        }
+        if (swipe.y > gameOptions.swipeMinNormal) {
+          this.makeMove(directions.down);
+        }
+        if (swipe.y < -gameOptions.swipeMinNormal) {
+          this.makeMove(directions.up);
+        }
+      }
+    }
+  }
+
+  makeMove(direction) {
+    console.log('direction ', direction);
   }
 
   update() {}
