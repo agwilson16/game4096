@@ -8,7 +8,8 @@ export const gameOptions = {
   boardSize: {
     rows: 4,
     columns: 4
-  }
+  },
+  tweenSpeed: 500 //in ms
 };
 
 const gameConfig = {
