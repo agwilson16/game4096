@@ -64,13 +64,16 @@ export default class Game extends Phaser.Scene {
     //get empty tiles
     let emptyTiles = [];
 
-    this.boardArray.forEach((row, rowIndex) => {
-      row.forEach((column, colIndex) => {
-        if (column.tileValue === 0) {
-          emptyTiles.push({ row: rowIndex, col: colIndex });
+    for (let i = 0; i < gameOptions.boardSize.rows; i++) {
+      for (let j = 0; j < gameOptions.boardSize.columns; j++) {
+        if (this.boardArray[i][j].tileValue === 0) {
+          emptyTiles.push({
+            row: i,
+            col: j
+          });
         }
-      });
-    });
+      }
+    }
 
     //place or show tiles
     if (emptyTiles.length > 0) {
@@ -90,11 +93,90 @@ export default class Game extends Phaser.Scene {
         duration: gameOptions.tweenSpeed,
         callbackScope: this,
         onComplete: () => {
-          console.log('tween completed');
           this.canMove = true;
         }
       });
     }
+  }
+
+  makeMove(d) {
+    //vertical direction
+    const dRow =
+      d === directions.left || d === directions.right
+        ? 0
+        : d === directions.up
+        ? -1
+        : 1;
+
+    //horizontal direction
+    const dCol =
+      d === directions.up || d === directions.down
+        ? 0
+        : d === directions.left
+        ? -1
+        : 1;
+
+    //will be used for z-depth (z-depth default is 0 for sprites)
+    let movedTiles = 0;
+
+    //prevent other moves while this move resolves
+    this.canMove = false;
+
+    const firstRow = d === directions.up ? 1 : 0;
+    const lastRow =
+      gameOptions.boardSize.rows - (d === directions.down ? 1 : 0);
+    const firstCol = d === directions.left ? 1 : 0;
+    const lastCol =
+      gameOptions.boardSize.columns - (d === directions.right ? 1 : 0);
+
+    for (let i = firstRow; i < lastRow; i++) {
+      for (let j = firstCol; j < lastCol; j++) {
+        //current row and column added for readability
+
+        const curRow = dRow === 1 ? lastRow - 1 - i : i;
+        const curCol = dCol === 1 ? lastCol - 1 - j : j;
+
+        //get the tile val
+        const tileValue = this.boardArray[curRow][curCol].tileValue;
+
+        //if it's not blank, get nre position
+        if (tileValue !== 0) {
+          let newRow = curRow;
+          let newCol = curCol;
+
+          while (this.isLegalPosition(newRow + dRow, newCol + dCol)) {
+            newRow += dRow;
+            newCol += dCol;
+          }
+
+          //for z-depth
+          movedTiles++;
+
+          const newPos = this.getTilePosition(newRow, newCol);
+
+          this.boardArray[curRow][curCol].tileSprite.depth = movedTiles;
+          this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
+          this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
+
+          this.boardArray[curRow][curCol].tileValue = 0;
+
+          if (this.boardArray[newRow][newCol].tileValue === tileValue) {
+            console.log('here');
+            this.boardArray[newRow][newCol].tileValue = tileValue + 1;
+            this.boardArray[curRow][curCol].tileSprite.setFrame(tileValue);
+          } else {
+            this.boardArray[newRow][newCol].tileValue = tileValue;
+          }
+        }
+      }
+    }
+    this.canMove = true;
+  }
+
+  isLegalPosition(row, col) {
+    const rowInside = row >= 0 && row < gameOptions.boardSize.rows;
+    const colInside = col >= 0 && col < gameOptions.boardSize.columns;
+    return rowInside && colInside;
   }
 
   //handle keyboard and swipe events
@@ -150,10 +232,6 @@ export default class Game extends Phaser.Scene {
         }
       }
     }
-  }
-
-  makeMove(direction) {
-    console.log('direction ', direction);
   }
 
   update() {}
