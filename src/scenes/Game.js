@@ -171,6 +171,25 @@ export default class Game extends Phaser.Scene {
       }
     }
     this.canMove = true;
+    this.refreshBoard();
+  }
+
+  refreshBoard() {
+    for (let i = 0; i < gameOptions.boardSize.rows; i++) {
+      for (let j = 0; j < gameOptions.boardSize.columns; j++) {
+        const spritePosition = this.getTilePosition(i, j);
+        this.boardArray[i][j].tileSprite.x = spritePosition.x;
+        this.boardArray[i][j].tileSprite.y = spritePosition.y;
+        const tileValue = this.boardArray[i][j].tileValue;
+        if (tileValue > 0) {
+          this.boardArray[i][j].tileSprite.visible = true;
+          this.boardArray[i][j].tileSprite.setFrame(tileValue - 1);
+        } else {
+          this.boardArray[i][j].tileSprite.visible = false;
+        }
+      }
+    }
+    this.addTile();
   }
 
   isLegalPosition(row, col) {
