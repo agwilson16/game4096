@@ -144,7 +144,9 @@ export default class Game extends Phaser.Scene {
           let newRow = curRow;
           let newCol = curCol;
 
-          while (this.isLegalPosition(newRow + dRow, newCol + dCol)) {
+          while (
+            this.isLegalPosition(newRow + dRow, newCol + dCol, tileValue)
+          ) {
             newRow += dRow;
             newCol += dCol;
           }
@@ -161,7 +163,6 @@ export default class Game extends Phaser.Scene {
           this.boardArray[curRow][curCol].tileValue = 0;
 
           if (this.boardArray[newRow][newCol].tileValue === tileValue) {
-            console.log('here');
             this.boardArray[newRow][newCol].tileValue = tileValue + 1;
             this.boardArray[curRow][curCol].tileSprite.setFrame(tileValue);
           } else {
@@ -180,7 +181,9 @@ export default class Game extends Phaser.Scene {
         const spritePosition = this.getTilePosition(i, j);
         this.boardArray[i][j].tileSprite.x = spritePosition.x;
         this.boardArray[i][j].tileSprite.y = spritePosition.y;
+
         const tileValue = this.boardArray[i][j].tileValue;
+
         if (tileValue > 0) {
           this.boardArray[i][j].tileSprite.visible = true;
           this.boardArray[i][j].tileSprite.setFrame(tileValue - 1);
@@ -192,9 +195,17 @@ export default class Game extends Phaser.Scene {
     this.addTile();
   }
 
-  isLegalPosition(row, col) {
+  isLegalPosition(row, col, value) {
     const rowInside = row >= 0 && row < gameOptions.boardSize.rows;
     const colInside = col >= 0 && col < gameOptions.boardSize.columns;
+
+    if (!rowInside || !colInside) {
+      return false;
+    }
+    const emptySpot = this.boardArray[row][col].tileValue == 0;
+    const sameValue = this.boardArray[row][col].tileValue == value;
+    return emptySpot || sameValue;
+
     return rowInside && colInside;
   }
 
